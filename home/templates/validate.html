@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Email Verification{% endblock %}
+
+{% block header %}Email Verification{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'validate' %}">
+    <h3>Email Verification</h3>
+    {% csrf_token %} 
+
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <label for="OTP" style="width: 100%; max-width: 300px; text-align: center;">Enter OTP</label>
+        <input type="text" id="OTP" name="OTP" class="form-control" placeholder="Enter OTP" style="width: 100%; max-width: 300px; margin-bottom: 20px;" required />
+
+        <button type="submit" class="button-style">Verify</button>
+    </div>
+</form>
+{% endblock %}
+

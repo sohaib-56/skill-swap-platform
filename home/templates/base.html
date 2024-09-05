@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyApplication{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css"/>
+    
+    <!-- Block for additional CSS files -->
+    {% block extra_css %}{% endblock %}
+
+    <!-- Block for additional head elements (e.g., meta tags) -->
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    {% block content %}{% endblock %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AlertifyJS JS -->
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+    
+    <!-- Block for additional JS scripts -->
+    {% block extra_js %}{% endblock %}
+    
+    {% if messages %}
+    <script>
+        {% for message in messages %}
+            if ('{{ message.tags }}' === 'error') {
+                alertify.error('{{ message }}');
+            } else if ('{{ message.tags }}' === 'success') {
+                alertify.success('{{ message }}');
+            }
+        {% endfor %}
+    </script>
+    {% endif %}
+</body>
+</html>

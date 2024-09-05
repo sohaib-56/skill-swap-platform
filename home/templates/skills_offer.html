@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Skills Information{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+{% endblock %}
+{% block content %}
+<form method="post">
+    <h3>Skills Information</h3>
+    {% csrf_token %}
+    <input type="hidden" name="user_id" value="{{ user.id }}">
+
+    <div id="skills-offered-container">
+        <div class="skill-entry" style="display: flex; align-items: center;">
+            <label for="skillsOffered" style="width: 50%;">Skills Offered</label>
+            <input type="text" id="skillsOffered" name="skills_offered[]" pattern="[A-Za-z]+" class="form-control" placeholder="Only contain letters" required />
+
+            <label for="experienceLevelOffered" style="width: 50%;">Experience Level (Offered)</label>
+            <select id="experienceLevelOffered" name="experience_level_offered[]" class="form-control" required>
+                <option value="" disabled selected>Select your experience level</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="expert">Expert</option>
+            </select>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: center;">
+        <button class="button-style" type="button" id="addSkillOffered" name="addSkillOffered">Add Skills</button>
+    </div>
+
+    <div style="display: flex; justify-content: center;">
+        <button class="button-style" type="submit">Next</button>
+    </div>
+    
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('addSkillOffered').addEventListener('click', function() {
+        const container = document.getElementById('skills-offered-container');
+        const lastSkillEntry = container.lastElementChild;
+        
+        // Validate the last set of inputs before adding a new one
+        const skillInput = lastSkillEntry.querySelector('input[name="skills_offered[]"]');
+        const levelSelect = lastSkillEntry.querySelector('select[name="experience_level_offered[]"]');
+        
+        if (!skillInput.value.trim() || !levelSelect.value) {
+            alert('Please fill out the current skill and experience level before adding a new one.');
+            return;
+        }
+
+        // Create and add a new skill entry
+        const newSkillOffered = `
+            <div class="skill-entry" style="display: flex; align-items: center;">
+                <label for="skillsOffered" style="width: 50%;">Skills Offered</label>
+                <input type="text" name="skills_offered[]" class="form-control" placeholder="Enter Skill" required />
+
+                <label for="experienceLevelOffered" style="width: 50%;">Experience Level (Offered)</label>
+                <select name="experience_level_offered[]" class="form-control" required>
+                    <option value="" disabled selected>Select your experience level</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="expert">Expert</option>
+                </select>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', newSkillOffered);
+    });
+</script>
+{% endblock %}

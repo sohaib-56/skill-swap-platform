@@ -1,0 +1,210 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Change Password - Skills Sharing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css"/>
+    <style>
+        body {
+            background-color: #e9ecef;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 10px 20px;
+        }
+
+        .navbar-brand {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .card {
+            border-radius: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .card-body {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/home">Skill Swap Platform</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{% url 'settings' %}">Settings</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+<form method="post">
+    {% csrf_token %}
+    <h3>Update Skills Information</h3>
+    <input type="hidden" name="user_id" value="{{ user.id }}">
+
+    <div id="skills-offered-container">
+        <h4>Skills Offered</h4>
+        {% for skill in skills_offered %}
+        <div class="skill-entry" style="display: flex; align-items: center; margin-bottom: 20px;">
+            <label for="skillsOffered" style="width: 50%;">Skills Offered</label>
+            <input type="text" name="skills_offered[]" value="{{ skill.name }}" pattern="[A-Za-z]+" class="form-control" placeholder="Only contain letters" required />
+
+            <label for="experienceLevelOffered" style="width: 50%;">Experience Level (Offered)</label>
+            <select name="experience_level_offered[]" class="form-control" required>
+                <option value="beginner" {% if skill.experience_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                <option value="intermediate" {% if skill.experience_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                <option value="expert" {% if skill.experience_level == 'expert' %}selected{% endif %}>Expert</option>
+            </select>
+        </div>
+        {% endfor %}
+    </div>
+    <div style="display: flex; justify-content: center;">
+        <button class="button-style" type="button" id="addSkillOffered" name="addSkillOffered">Add Skills</button>
+    </div>
+
+    <div id="skills-needed-container">
+        <h4>Skills Needed</h4>
+        {% for skill in skills_needed %}
+        <div class="skill-entry" style="display: flex; align-items: center; margin-bottom: 20px;">
+            <label for="skillsNeeded" style="width: 33%;">Skills Needed</label>
+            <input type="text" name="skills_needed[]" value="{{ skill.name }}" pattern="[A-Za-z]+" class="form-control" placeholder="Only contain letters" required />
+
+            <label for="experienceLevelNeeded" style="width: 33%;">Experience Level (Needed)</label>
+            <select name="experience_level_needed[]" class="form-control" required>
+                <option value="beginner" {% if skill.experience_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                <option value="intermediate" {% if skill.experience_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                <option value="expert" {% if skill.experience_level == 'expert' %}selected{% endif %}>Expert</option>
+            </select>
+
+            <label for="priority" style="width: 33%;">Priority</label>
+            <input type="number" name="priorities[]" value="{{ skill.priority }}" class="form-control" min="1" required />
+        </div>
+        {% endfor %}
+    </div>
+    <div style="display: flex; justify-content: center;">
+        <button class="button-style" type="button" id="addSkillNeeded" name="addSkillNeeded">Add Skills</button>
+    </div>
+
+    <div style="display: flex; justify-content: center;">
+        <button class="button-style" type="submit">Update</button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('addSkillOffered').addEventListener('click', function() {
+        const container = document.getElementById('skills-offered-container');
+        const lastSkillEntry = container.lastElementChild;
+
+        const skillInput = lastSkillEntry.querySelector('input[name="skills_offered[]"]');
+        const levelSelect = lastSkillEntry.querySelector('select[name="experience_level_offered[]"]');
+        
+        if (!skillInput.value.trim() || !levelSelect.value) {
+            alert('Please fill out the current skill and experience level before adding a new one.');
+            return;
+        }
+
+        const newSkillOffered = `
+            <div class="skill-entry" style="display: flex; align-items: center;">
+                <label for="skillsOffered" style="width: 50%;">Skills Offered</label>
+                <input type="text" name="skills_offered[]" class="form-control" placeholder="Enter Skill" required />
+
+                <label for="experienceLevelOffered" style="width: 50%;">Experience Level (Offered)</label>
+                <select name="experience_level_offered[]" class="form-control" required>
+                    <option value="" disabled selected>Select your experience level</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="expert">Expert</option>
+                </select>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', newSkillOffered);
+    });
+
+    document.getElementById('addSkillNeeded').addEventListener('click', function() {
+        const container = document.getElementById('skills-needed-container');
+        const lastSkillEntry = container.lastElementChild;
+
+        const skillInput = lastSkillEntry.querySelector('input[name="skills_needed[]"]');
+        const levelSelect = lastSkillEntry.querySelector('select[name="experience_level_needed[]"]');
+        const priorityInput = lastSkillEntry.querySelector('input[name="priorities[]"]');
+        
+        if (!skillInput.value.trim() || !levelSelect.value || !priorityInput.value.trim()) {
+            alert('Please fill out the current skill, experience level, and priority before adding a new one.');
+            return;
+        }
+
+        const newSkillNeeded = `
+            <div class="skill-entry" style="display: flex; align-items: center; margin-bottom: 20px;">
+                <label for="skillsNeeded" style="width: 33%;">Skills Needed</label>
+                <input type="text" name="skills_needed[]" class="form-control" placeholder="Enter Skill" required />
+
+                <label for="experienceLevelNeeded" style="width: 33%;">Experience Level (Needed)</label>
+                <select name="experience_level_needed[]" class="form-control" required>
+                    <option value="" disabled selected>Select your experience level</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="expert">Expert</option>
+                </select>
+
+                <label for="priority" style="width: 33%;">Priority</label>
+                <input type="number" name="priorities[]" class="form-control" min="1" required />
+            </div>`;
+        container.insertAdjacentHTML('beforeend', newSkillNeeded);
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+{% if messages %}
+<script>
+    {% for message in messages %}
+        if ('{{ message.tags }}' === 'error') {
+            alertify.error('{{ message }}');
+        } else if ('{{ message.tags }}' === 'success') {
+            alertify.success('{{ message }}');
+        }
+    {% endfor %}
+</script>
+{% endif %}
+</body>
+
+</html>
+

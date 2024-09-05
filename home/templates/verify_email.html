@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login Page{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+{% block content %}
+<form method="post">
+    <h3>Verify Here</h3>
+    {% csrf_token %} 
+
+    <label for="text">Enter Email</label>
+    <input type="email" placeholder="Email" id="email" name="email">
+    <button type="submit">Send OTP</button>
+    <input type="hidden" name="otp" value="{{ request.session.otp }}">
+    <input type="hidden" name="semail" value="{{ request.session.email }}">
+</form>
+{% endblock %}
+{% comment %} action= "{% url 'verify' %}" {% endcomment %}
