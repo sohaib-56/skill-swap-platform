@@ -449,3 +449,7 @@ def profile_view(request, user_id):
     skillsoffer = get_object_or_404(Skilloffer,id=user_id)
     context = {'user': user,'skillsneed':skillsneed,'skillsoffer':skillsoffer,}
     return render(request, 'userprofile.html', context)
+
+
+def connect_view(request):
+    pass
