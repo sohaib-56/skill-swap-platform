@@ -30,6 +30,10 @@ class User(AbstractUser):
     @property
     def total_comments(self):
         return self.comment_set.count()  # Count total comments made by the user
+    
+    @property
+    def total_matches(self):
+        return self.match_user_set.count()
 
 
 # Skill offer model for the dashboard
