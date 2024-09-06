@@ -21,6 +21,7 @@ urlpatterns = [
     path('comment/<int:post_id>/',comment,name='comment'),
     path('like_comment/<int:comment_id>/', like_comment, name='like_comment'),
     path('profile/<int:user_id>/', profile_view, name='profile'),
+    path('match_suggestions',match_suggestions,name='match_suggestions'),
     
 
 ]

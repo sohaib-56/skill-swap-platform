@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect,get_object_or_404
-from .models import User, Skilloffer, SkillsNeeded,Post_data,Like,Comment,CommentLike,SwapHistory
+from .models import User, Skilloffer, SkillsNeeded,Post_data,Like,Comment,CommentLike,SwapHistory,MatchSuggestion
 from .matching_algorithm import find_all_matches
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -494,3 +494,36 @@ def Userdashboard(request):
     }
 
     return render(request, 'Userdashboard.html', context)
+
+
+def match_suggestions(request):
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
+
+    try:
+        # Fetch user's offered and needed skills
+        skillsoffer = Skilloffer.objects.filter(user=user)
+        skillsneed = SkillsNeeded.objects.filter(user=user)
+        
+        # Fetch match suggestions based on user's skills
+        # This should be replaced with actual logic for fetching match suggestions
+        match_suggestions = MatchSuggestion.objects.filter(user=user)
+        match_count = match_suggestions.count()
+        
+        # Example of match suggestion data, replace with your actual data
+        matches = match_suggestions.values('match_user__username', 'match_user__email')
+
+    except Exception as e:
+        # Handle any exceptions that occur
+        match_count = 0
+        matches = []
+    
+    context = {
+        'skillsoffer': skillsoffer,
+        'skillsneed': skillsneed,
+        'match_count': match_count,
+        'matches': matches
+    }
+
+    return render(request, 'match_suggestions.html', context)
+

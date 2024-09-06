@@ -125,3 +125,15 @@ class SwapHistory(models.Model):
         verbose_name = 'Swap History'
         verbose_name_plural = 'Swap Histories'
         ordering = ['-swap_date']
+
+class MatchSuggestion(models.Model):
+    user = models.ForeignKey(User, related_name='match_suggestions', on_delete=models.CASCADE)
+    match_user = models.ForeignKey(User, related_name='matches', on_delete=models.CASCADE)
+    match_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)  # Example field for score or relevance
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'match_user')  # Ensures no duplicate matches
+
+    def __str__(self):
+        return f'{self.user.username} matched with {self.match_user.username}'
