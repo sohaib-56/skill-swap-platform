@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect,get_object_or_404
-from .models import User, Skilloffer, SkillsNeeded,Post_data,Like,Comment,CommentLike
+from .models import User, Skilloffer, SkillsNeeded,Post_data,Like,Comment,CommentLike,SwapHistory
 from .matching_algorithm import find_all_matches
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -317,7 +317,6 @@ def change_password(request):
     return render(request,'Update_password.html',{'user':user})
 
 #update profile
-@login_required(login_url='login')
 def profile(request):
     user_id = request.session.get('user_id')
     user = User.objects.get(id=user_id)
@@ -453,3 +452,45 @@ def profile_view(request, user_id):
 
 def connect_view(request):
     pass
+
+
+def Userdashboard(request):
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
+
+    # if not user.is_authenticated:
+    #     return redirect('login')  # Redirect to login page if user is not authenticated
+
+    # Fetch user-specific data
+    try:
+        user = User.objects.get(username=user.username)
+        skillsoffer = Skilloffer.objects.filter(user=user)
+        skillsneed = SkillsNeeded.objects.filter(user=user)
+        match_count = ...  # Fetch match suggestions count
+        swap_history_count = SwapHistory.objects.filter(user=user).count()
+        upcoming_sessions_count = ...  # Fetch count of upcoming sessions
+        recent_activity = ...  # Fetch recent activity
+        skill_in_progress = ...  # Fetch skill improvement progress
+    except User.DoesNotExist:
+        # Handle case where user data does not exist
+        user = None
+        skillsoffer = None
+        skillsneed = None
+        match_count = 0
+        swap_history_count = 0
+        upcoming_sessions_count = 0
+        recent_activity = "No recent activity"
+        skill_in_progress = "No progress tracked"
+
+    context = {
+        'user': user,
+        'skillsoffer': skillsoffer,
+        'skillsneed': skillsneed,
+        'match_count': match_count,
+        'swap_history_count': swap_history_count,
+        'upcoming_sessions_count': upcoming_sessions_count,
+        'recent_activity': recent_activity,
+        'skill_in_progress': skill_in_progress,
+    }
+
+    return render(request, 'Userdashboard.html', context)
